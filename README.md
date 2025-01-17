@@ -1,3 +1,3 @@
 # vue-study
 
-![Uploading vue学习路径 Relationship-vue学习路径.png…]()
+<img width="372" alt="vue学习路径 Relationship" src="https://github.com/user-attachments/assets/1e2bf8d8-f1f2-490d-957c-f006f26bb3e4" />
