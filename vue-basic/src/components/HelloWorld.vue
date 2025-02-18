@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, reactive, ref } from 'vue'
 defineProps({
   msg: {
     type: String,
@@ -8,10 +8,31 @@ defineProps({
 })
 
 const count = ref(0)
+const firstName = ref('John')
+const lastName = ref('Doe')
 
 const method = () => {
-  count.value++
+  fullName.value = 'Allison Harward'
 }
+
+const author = reactive({
+  name: 'John Doe',
+  books: ['Vue 3 Guide', 'Vue 3 Cookbook'],
+})
+
+const publishedBooksMessage = computed(() => {
+  return author.books.length > 0 ? 'Yes' : 'No'
+})
+
+const fullName = computed( {
+  get() {
+    return firstName.value + ' ' + lastName.value
+  },
+  set(newValue) {
+    [firstName.value, lastName.value] = newValue.split(' ')
+
+  }
+})
 
 </script>
 
@@ -23,6 +44,9 @@ const method = () => {
       <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
       <a href="https://vuejs.org/" target="_blank" rel="noopener">Vue 3</a>.
     </h3>
+    <p>Has published books:</p>
+    <span>{{ publishedBooksMessage }}</span>
+    <p>Full Name: {{fullName}}</p>
   </div>
 </template>
 

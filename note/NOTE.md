@@ -154,6 +154,13 @@ template
 
 该特性仅仅是文本插值的一个便利特性，等价于 `{{ object.id.value }}`。
 
+## 计算属性
+
+计算属性值会基于其响应式依赖被缓存
+
+#### Getter 不应有副作用​
+计算属性的 getter 应只做计算而没有任何其他的副作用，这一点非常重要，请务必牢记。举例来说，不要改变其他状态、在 getter 中做异步请求或者更改 DOM！一个计算属性的声明中描述的是如何根据其他值派生一个值。因此 getter 的职责应该仅为计算和返回该值。
+
 ## Tips
 
 ### 判断一个网页是用什么前端框架开发的
@@ -163,3 +170,15 @@ template
 - Vue.js 可能会有 id="app"，或者 data-v-* 这样的属性。
 - React 可能会有 data-reactroot，或者 id="root"。
 - Angular 可能会有 ng-* 这样的属性，如 ng-app 或 ng-version。
+
+
+### 副作用
+
+在 Vue（或者 React 等前端框架）中，副作用（side effect） 指的是会影响组件外部状态或有异步行为的操作，比如 修改 DOM、请求 API、操作本地存储、设置定时器 等。
+
+- 发起 HTTP 请求
+- 操作 localStorage / sessionStorage
+- 手动修改 DOM
+- 监听全局事件（如 window.addEventListener）
+- 设置 setTimeout、setInterval
+- 修改 Vue 组件之外的变量
