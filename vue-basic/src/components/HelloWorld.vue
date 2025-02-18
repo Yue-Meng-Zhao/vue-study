@@ -1,4 +1,5 @@
 <script setup>
+import { ref } from 'vue'
 defineProps({
   msg: {
     type: String,
@@ -6,14 +7,17 @@ defineProps({
   },
 })
 
+const count = ref(0)
+
 const method = () => {
-  alert("Hello, world!");
+  count.value++
 }
+
 </script>
 
 <template>
   <div class="greetings">
-    <h1         @click="method" class="green">{{ msg }}</h1>
+    <h1 @click="method" class="green">{{ count }}</h1>
     <h3>
       You’ve successfully created a project with
       <a href="https://vite.dev/" target="_blank" rel="noopener">Vite</a> +
