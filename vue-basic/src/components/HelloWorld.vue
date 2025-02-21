@@ -10,6 +10,7 @@ defineProps({
 const count = ref(0)
 const firstName = ref('John')
 const lastName = ref('Doe')
+const awesome = ref(true)
 
 const method = () => {
   fullName.value = 'Allison Harward'
@@ -47,6 +48,12 @@ const fullName = computed( {
     <p>Has published books:</p>
     <span>{{ publishedBooksMessage }}</span>
     <p>Full Name: {{fullName}}</p>
+  </div>
+  <div>
+    <button @click="awesome = !awesome">Toggle</button>
+
+    <h2 v-if="awesome">Vue is awesome!</h2>
+    <h2 v-else>Oh no 😢</h2>
   </div>
 </template>
 

@@ -161,6 +161,80 @@ template
 #### Getter 不应有副作用​
 计算属性的 getter 应只做计算而没有任何其他的副作用，这一点非常重要，请务必牢记。举例来说，不要改变其他状态、在 getter 中做异步请求或者更改 DOM！一个计算属性的声明中描述的是如何根据其他值派生一个值。因此 getter 的职责应该仅为计算和返回该值。
 
+## Class 与 Style 绑定
+
+### 绑定数组
+
+可以给 :class 绑定一个数组来渲染多个 CSS class：
+
+```javascript
+const activeClass = ref('active')
+const errorClass = ref('text-danger')
+```
+
+```javascript
+<div :class="[activeClass, errorClass]"></div>
+```
+
+渲染的结果是：
+
+```javascript
+<div class="active text-danger"></div>
+```
+
+### 绑定内联样式
+
+```javascript
+const activeColor = ref('red')
+const fontSize = ref(30)
+```
+
+```javascript
+<div :style="{ color: activeColor, fontSize: fontSize + 'px' }"></div>
+```
+
+尽管推荐使用 camelCase，但 :style 也支持 kebab-cased 形式的 CSS 属性 key (对应其 CSS 中的实际名称)，例如：
+
+```javascript
+<div :style="{ 'font-size': fontSize + 'px' }"></div>
+```
+
+## 条件渲染
+
+### v-if vs. v-show
+
+v-show 会在 DOM 渲染中保留该元素；v-show 仅切换了该元素上名为 display 的 CSS 属性。
+
+v-show 不支持在 ```<template>``` 元素上使用，也不能和 v-else 搭配使用。
+
+v-if 是“真实的”按条件渲染，因为它确保了在切换时，条件区块内的事件监听器和子组件都会被销毁与重建。
+
+v-if 也是惰性的：如果在初次渲染时条件值为 false，则不会做任何事。条件区块只有当条件首次变为 true 时才被渲染。
+
+相比之下，v-show 简单许多，元素无论初始条件如何，始终会被渲染，只有 CSS display 属性会被切换。
+
+总的来说，v-if 有更高的切换开销，而 v-show 有更高的初始渲染开销。因此，如果需要频繁切换，则使用 v-show 较好；如果在运行时绑定条件很少改变，则 v-if 会更合适。
+
+⚠️ 警告
+
+*同时使用 v-if 和 v-for 是不推荐的，因为这样二者的优先级不明显。*
+
+
+## 列表渲染
+
+```javascript
+<li v-for="item in items">
+  {{ item.message }}
+</li>
+```
+
+也可以使用 of 作为分隔符来替代 in，这更接近 JavaScript 的迭代器语法：
+
+```javascript
+<div v-for="item of items"></div>
+```
+
+
 ## Tips
 
 ### 判断一个网页是用什么前端框架开发的
