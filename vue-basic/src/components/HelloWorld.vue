@@ -11,6 +11,21 @@ const count = ref(0)
 const firstName = ref('John')
 const lastName = ref('Doe')
 const awesome = ref(true)
+const numbers = ref([1, 2, 3, 4, 5])
+const name = ref('Vue.js')
+const checked = ref(false)
+const checkedNames = ref([])
+const selected = ref('')
+const picked = ref('')
+const toggle = ref('yes')
+const pick = ref('second')
+const first = ref('first')
+const second = ref('second')
+const message = ref('Hello Vue!')
+
+const evenNumbers = computed(() => {
+  return numbers.value.filter((n) => n%2 == 0)
+})
 
 const method = () => {
   fullName.value = 'Allison Harward'
@@ -35,6 +50,26 @@ const fullName = computed( {
   }
 })
 
+function greet(event) {
+  alert(`Hello ${name.value}!`)
+  // `event` 是 DOM 原生事件
+  if (event) {
+    alert(event.target.tagName)
+  }
+}
+
+function warn(message, event) {
+  // 这里可以访问原生事件
+  if (event) {
+    event.preventDefault()
+  }
+  alert(message)
+}
+
+function doSomething() {
+  alert('Doing something...')
+}
+
 </script>
 
 <template>
@@ -54,6 +89,55 @@ const fullName = computed( {
 
     <h2 v-if="awesome">Vue is awesome!</h2>
     <h2 v-else>Oh no 😢</h2>
+    <li v-for="n in evenNumbers" :key="n"> {{n}}</li>
+    <button @click="greet">Greet</button>
+    <button @click="(event) => warn('Form cannot be submitted yet.', event)">
+      Submit
+    </button>
+    <div @contextmenu.ctrl.prevent="doSomething">Do something</div>
+    <input type="checkbox" id="checkbox" v-model="checked" />
+    <label for="checkbox">{{ checked }}</label>
+
+    <div>Checked names: {{ checkedNames }}</div>
+
+    <input type="checkbox" id="jack" value="Jack" v-model="checkedNames" />
+    <label for="jack">Jack</label>
+
+    <input type="checkbox" id="john" value="John" v-model="checkedNames" />
+    <label for="john">John</label>
+    
+    <input type="checkbox" id="mike" value="Mike" v-model="checkedNames" />
+    <label for="mike">Mike</label>
+
+    <div>Selected: {{ selected }}</div>
+
+    <select v-model="selected">
+      <option disabled value="">Please select one</option>
+      <option>A</option>
+      <option>B</option>
+      <option>C</option>
+    </select>
+
+    <div>
+      <input type="checkbox" v-model="picked" />
+      <div>{{ picked }}</div>
+    </div>
+
+    <input
+      type="checkbox"
+      v-model="toggle"
+      true-value="yes"
+      false-value="no" />
+    <div>{{ toggle }}</div>
+
+    <input type="radio" v-model="pick" :value="first" />
+    <input type="radio" v-model="pick" :value="second" />
+
+    <input v-model.lazy="message" />
+    <div>{{ message }}</div>
+
+
+
   </div>
 </template>
 

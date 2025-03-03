@@ -234,6 +234,99 @@ v-if 也是惰性的：如果在初次渲染时条件值为 false，则不会做
 <div v-for="item of items"></div>
 ```
 
+推荐在任何可行的时候为 v-for 提供一个 key attribute。
+
+在计算属性中使用 reverse() 和 sort() 的时候务必小心！这两个方法将变更原始数组，计算函数中不应该这么做。请在调用这些方法之前创建一个原数组的副本：
+
+```javascript
+- return numbers.reverse()
++ return [...numbers].reverse()
+```
+
+## 事件处理
+
+```javascript
+<!-- 单击事件将停止传递 -->
+<a @click.stop="doThis"></a>
+
+<!-- 提交事件将不再重新加载页面 -->
+<form @submit.prevent="onSubmit"></form>
+
+<!-- 修饰语可以使用链式书写 -->
+<a @click.stop.prevent="doThat"></a>
+
+<!-- 也可以只有修饰符 -->
+<form @submit.prevent></form>
+
+<!-- 仅当 event.target 是元素本身时才会触发事件处理器 -->
+<!-- 例如：事件处理器不来自子元素 -->
+<div @click.self="doThat">...</div>
+```
+
+```javascript
+<!-- Ctrl + 点击 -->
+<div @click.ctrl="doSomething">Do something</div>
+```
+
+⚠️ 在 Mac 电脑上，按住 Control 键 + 点击鼠标 默认会触发“右键（context menu）”操作，而不是普通的 click 事件。因此，在 Vue 里使用 @click.ctrl 时，可能不会按预期触发。
+
+可以监听 contextmenu 事件（右键菜单事件）：
+
+```javascript
+<div @contextmenu.ctrl.prevent="doSomething">按住 Control + 点击</div>
+```
+
+## 表单输入绑定
+
+### 复选框
+
+可以将多个复选框绑定到同一个数组或集合的值：
+
+```javascript
+const checkedNames = ref([])
+```
+
+```javascript
+<div>Checked names: {{ checkedNames }}</div>
+
+<input type="checkbox" id="jack" value="Jack" v-model="checkedNames" />
+<label for="jack">Jack</label>
+
+<input type="checkbox" id="john" value="John" v-model="checkedNames" />
+<label for="john">John</label>
+
+<input type="checkbox" id="mike" value="Mike" v-model="checkedNames" />
+<label for="mike">Mike</label>
+```
+
+### 选择器
+
+单个选择器的示例如下：
+
+```javascript
+<div>Selected: {{ selected }}</div>
+
+<select v-model="selected">
+  <option disabled value="">Please select one</option>
+  <option>A</option>
+  <option>B</option>
+  <option>C</option>
+</select>
+```
+
+⚠️ 注意：**如果 v-model 表达式的初始值不匹配任何一个选择项，`<select>` 元素会渲染成一个“未选择”的状态。在 iOS 上，这将导致用户无法选择第一项，因为 iOS 在这种情况下不会触发一个 change 事件。因此，我们建议提供一个空值的禁用选项，如上面的例子所示。**
+
+
+### 修饰符
+
+#### .lazy
+触发时机：当输入框失去焦点（blur）或用户按下 Enter 时，Vue 才会更新数据。
+
+```javascript
+<!-- 在 "change" 事件后同步更新而不是 "input" -->
+<input v-model.lazy="msg" />
+```
+
 
 ## Tips
 
