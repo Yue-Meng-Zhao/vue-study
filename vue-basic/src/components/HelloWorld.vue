@@ -1,5 +1,5 @@
 <script setup>
-import { computed, reactive, ref } from 'vue'
+import { computed, reactive, ref, watch } from 'vue'
 defineProps({
   msg: {
     type: String,
@@ -22,6 +22,15 @@ const pick = ref('second')
 const first = ref('first')
 const second = ref('second')
 const message = ref('Hello Vue!')
+const obj = reactive({ count: 0 })
+
+watch(obj, (newValue, oldValue) => {
+  // 在嵌套的属性变更时触发
+  // 注意：`newValue` 此处和 `oldValue` 是相等的
+  // 因为它们是同一个对象！
+  console.log('new value:', newValue.count)
+  console.log('old value:', oldValue.count)
+})
 
 const evenNumbers = computed(() => {
   return numbers.value.filter((n) => n%2 == 0)
@@ -135,8 +144,8 @@ function doSomething() {
 
     <input v-model.lazy="message" />
     <div>{{ message }}</div>
-
-
+    <button @click="obj.count++">Count + </button>
+    <span>{{obj.count}}</span>
 
   </div>
 </template>

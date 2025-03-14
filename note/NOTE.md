@@ -317,15 +317,140 @@ const checkedNames = ref([])
 ⚠️ 注意：**如果 v-model 表达式的初始值不匹配任何一个选择项，`<select>` 元素会渲染成一个“未选择”的状态。在 iOS 上，这将导致用户无法选择第一项，因为 iOS 在这种情况下不会触发一个 change 事件。因此，我们建议提供一个空值的禁用选项，如上面的例子所示。**
 
 
-### 修饰符
+## 侦听器
 
-#### .lazy
-触发时机：当输入框失去焦点（blur）或用户按下 Enter 时，Vue 才会更新数据。
+watch 的第一个参数可以是不同形式的“数据源”：它可以是一个 ref (包括计算属性)、一个响应式对象、一个 getter 函数、或多个数据源组成的数组：
+
+
+⚠️ 注意，不能直接侦听响应式对象的属性值，例如:
 
 ```javascript
-<!-- 在 "change" 事件后同步更新而不是 "input" -->
-<input v-model.lazy="msg" />
+const obj = reactive({ count: 0 })
+
+// 错误，因为 watch() 得到的参数是一个 number
+watch(obj.count, (count) => {
+  console.log(`Count is: ${count}`)
+})
 ```
+
+### watchEffect()
+watchEffect() 允许我们自动跟踪回调的响应式依赖。
+
+```javascript
+watchEffect(async () => {
+  const response = await fetch(
+    `https://jsonplaceholder.typicode.com/todos/${todoId.value}`
+  )
+  data.value = await response.json()
+})
+```
+这个例子中，回调会立即执行，不需要指定 immediate: true。在执行期间，它会自动追踪 todoId.value 作为依赖（和计算属性类似）。
+
+对于这种只有一个依赖项的例子来说，watchEffect() 的好处相对较小。但是对于有多个依赖项的侦听器来说，使用 watchEffect() 可以消除手动维护依赖列表的负担。
+
+
+### 副作用清理
+
+使用 onWatcherCleanup()  API 来注册一个清理函数，当侦听器失效并准备重新运行时会被调用：
+
+```javascript
+import { watch, onWatcherCleanup } from 'vue'
+
+watch(id, (newId) => {
+  const controller = new AbortController()
+
+  fetch(`/api/${newId}`, { signal: controller.signal }).then(() => {
+    // 回调逻辑
+  })
+
+  onWatcherCleanup(() => {
+    // 终止过期请求
+    controller.abort()
+  })
+})
+```
+
+### 回调的触发时机
+
+默认情况下，侦听器回调会在父组件更新 (如有) 之后、所属组件的 DOM 更新之前被调用。这意味着如果你尝试在侦听器回调中访问所属组件的 DOM，那么 DOM 将处于更新前的状态。
+
+后置刷新的 watchEffect() 有个更方便的别名 watchPostEffect()：
+
+```javascript
+import { watchPostEffect } from 'vue'
+
+watchPostEffect(() => {
+  /* 在 Vue 更新后执行 */
+})
+```
+
+同步触发的 watchEffect() 有个更方便的别名 watchSyncEffect()：
+
+```javascript
+import { watchSyncEffect } from 'vue'
+
+watchSyncEffect(() => {
+  /* 在响应式数据变化时同步执行 */
+})
+```
+
+### 停止侦听器
+
+⚠️ 侦听器必须用同步语句创建：如果用异步回调创建一个侦听器，那么它不会绑定到当前组件上，你必须手动停止它，以防内存泄漏。
+
+```javascript
+<script setup>
+import { watchEffect } from 'vue'
+
+// 它会自动停止
+watchEffect(() => {})
+
+// ...这个则不会！
+setTimeout(() => {
+  watchEffect(() => {})
+}, 100)
+</script>
+```
+
+要手动停止一个侦听器，请调用 watch 或 watchEffect 返回的函数：
+
+```javascript
+const unwatch = watchEffect(() => {})
+
+// ...当该侦听器不再需要时
+unwatch()
+```
+
+需要异步创建侦听器的情况很少，尽可能选择同步创建。
+
+## 模版引用
+
+### 访问模板引用
+
+要在组合式 API 中获取引用，可以使用辅助函数 useTemplateRef() ：
+
+```javascript
+<script setup>
+import { useTemplateRef, onMounted } from 'vue'
+
+// 第一个参数必须与模板中的 ref 值匹配
+const input = useTemplateRef('my-input')
+
+onMounted(() => {
+  input.value.focus()
+})
+</script>
+
+<template>
+  <input ref="my-input" />
+</template>
+```
+
+### 组件上的 ref
+
+
+
+
 
 
 ## Tips
